@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- In your HTML head -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOOK - Virtual Glasses Try-On</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Three.js for 3D rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- MediaPipe for face tracking -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="threejsContainer" class="threejs-container"></div>
+    <script src="setup.js"></script>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>👓 LOOK </h1>
+            <p class="subtitle">Virtual Try-On with Deep Learning Face Analysis</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel: Camera & AR View -->
+            <div class="left-panel">
+                <div class="ar-viewer">
+                    <div class="camera-container">
+                        <video class="input-video" id="inputVideo" autoplay muted></video>
+                        <canvas class="output-canvas" id="outputCanvas"></canvas>
+                        <div class="glasses-overlay" id="glassesOverlay"></div>
+                    </div>
+                    
+                    <div class="camera-controls">
+                        <button id="startCamera" class="btn btn-primary">
+                            <span class="icon">🎥</span> Start Camera
+                        </button>
+                        <button id="captureFace" class="btn btn-success" disabled>
+                            <span class="icon">📸</span> Capture & Analyze
+                        </button>
+                        <button id="toggleAR" class="btn btn-info" disabled>
+                            <span class="icon">👓</span> Show Glasses
+                        </button>
+                        <button id="stopCamera" class="btn btn-danger">
+                            <span class="icon">⏹️</span> Stop
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Face Analysis Results -->
+                <div class="analysis-results">
+                    <div class="result-card">
+                        <h3><span class="icon">🧠</span> Face Analysis</h3>
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <label>Face Shape:</label>
+                                <span id="faceShape" class="highlight">Detecting...</span>
+                            </div>
+                            <div class="result-item">
+                                <label>Confidence:</label>
+                                <span id="confidence">-</span>
+                            </div>
+                            <div class="result-item">
+                                <label>Face Width:</label>
+                                <span id="faceWidth">-</span>
+                            </div>
+                            <div class="result-item">
+                                <label>Face Height:</label>
+                                <span id="faceHeight">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Glasses Selection & Recommendations -->
+            <div class="right-panel">
+                <!-- Recommended Glasses -->
+                <div class="recommendations-section">
+                    <h3><span class="icon">⭐</span> Recommended for You</h3>
+                    <div class="glasses-grid" id="recommendedGlasses">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- All Glasses Gallery -->
+                <div class="gallery-section">
+                    <h3><span class="icon">🛍️</span> Try Different Styles</h3>
+                    <div class="glasses-gallery" id="glassesGallery">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Glasses Controls -->
+                <div class="controls-section">
+                    <h3><span class="icon">🎛️</span> Adjust Glasses</h3>
+                    <div class="slider-controls">
+                        <div class="slider-group">
+                            <label for="sizeSlider">Size: <span id="sizeValue">100%</span></label>
+                            <input type="range" id="sizeSlider" min="50" max="150" value="100">
+                        </div>
+                        <div class="slider-group">
+                            <label for="posYSlider">Position Y: <span id="posYValue">0</span></label>
+                            <input type="range" id="posYSlider" min="-50" max="50" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <label for="rotSlider">Rotation: <span id="rotValue">0°</span></label>
+                            <input type="range" id="rotSlider" min="-30" max="30" value="0">
+                        </div>
+                        <div class="slider-group">
+                            <label for="opacitySlider">Opacity: <span id="opacityValue">100%</span></label>
+                            <input type="range" id="opacitySlider" min="0" max="100" value="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AR Canvas (hidden, for Three.js rendering) -->
+        <div id="arCanvasContainer" class="hidden">
+            <canvas id="arCanvas"></canvas>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p id="loadingText">Loading Face Detection Model...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="script.js"></script>
+    <script src="ar-engine.js"></script>
+    <script src="glasses-renderer.js"></script>
+</body>
+</html>
